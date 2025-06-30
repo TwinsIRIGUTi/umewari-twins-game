@@ -57,29 +57,46 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight - 90; // ボタン部分除く
+canvas.height = window.innerHeight - 90;
 
 const laneCount = 3;
 const laneX = [...Array(laneCount)].map((_, i) => canvas.width * (i + 0.5) / laneCount);
 let currentLane = 1;
-let score = 0;
-let startTime = Date.now();
-
-const player = { x: laneX[currentLane], y: canvas.height - 60, w: 30, h: 30 };
+let player = { x: laneX[currentLane], y: canvas.height - 60, w: 30, h: 30, vx: 0 };
 let bullets = [];
 let enemies = [];
 let barricades = [];
 let shootCounter = 0;
 let gameOver = false;
+let score = 0;
+let startTime = Date.now();
+let moveDir = 0; // -1: 左, 1: 右
 
-document.getElementById("leftBtn").addEventListener("click", () => {
-  if (currentLane > 0) currentLane--;
-  player.x = laneX[currentLane];
-});
-document.getElementById("rightBtn").addEventListener("click", () => {
-  if (currentLane < laneCount - 1) currentLane++;
-  player.x = laneX[currentLane];
-});
+const moveSpeed = 4;
+
+const scoreEl = document.getElementById("score");
+const timeEl = document.getElementById("time");
+
+function resetGame() {
+  bullets = [];
+  enemies = [];
+  barricades = [];
+  shootCounter = 0;
+  gameOver = false;
+  score = 0;
+  startTime = Date.now();
+  player.x = laneX[1];
+  currentLane = 1;
+  player.vx = 0;
+  scoreEl.textContent = "0";
+  loop();
+}
+
+document.getElementById("leftBtn").addEventListener("touchstart", () => moveDir = -1);
+document.getElementById("leftBtn").addEventListener("touchend", () => moveDir = 0);
+document.getElementById("rightBtn").addEventListener("touchstart", () => moveDir = 1);
+document.getElementById("rightBtn").addEventListener("touchend", () => moveDir = 0);
+
 document.getElementById("placeBtn").addEventListener("click", () => {
   barricades.push({
     x: laneX[currentLane], y: player.y - 120, lane: currentLane, hp: 1
@@ -99,6 +116,13 @@ function spawnEnemy() {
 function update() {
   if (gameOver) return;
 
+  // スムーズな移動
+  player.x += moveDir * moveSpeed;
+  // レーン判定更新
+  currentLane = laneX.reduce((prev, cx, i) => 
+    Math.abs(player.x - cx) < Math.abs(player.x - laneX[prev]) ? i : prev, 0);
+
+  // 弾処理
   shootCounter++;
   if (shootCounter % 15 === 0) shoot();
   if (shootCounter % 60 === 0) spawnEnemy();
@@ -108,8 +132,8 @@ function update() {
 
   enemies.forEach(e => e.y += e.speed);
 
-  // 当たり判定
-  bullets.forEach((b, i) => {
+  // 弾の当たり判定
+  bullets.forEach(b => {
     enemies.forEach((e, j) => {
       if (e.lane === currentLane &&
           Math.abs(b.x - e.x) < 15 && Math.abs(b.y - e.y) < 20) {
@@ -118,7 +142,7 @@ function update() {
         if (e.hp <= 0) {
           enemies.splice(j, 1);
           score += 10;
-          document.getElementById("score").textContent = score;
+          scoreEl.textContent = score;
         }
       }
     });
@@ -135,15 +159,19 @@ function update() {
     });
   });
 
-  // 敵到達チェック
+  // ゲームオーバー判定
   enemies.forEach(e => {
     if (e.y > player.y - 10 && e.lane === currentLane) {
       gameOver = true;
-      alert("ゲームオーバー！\nスコア: " + score + "\n時間: " + ((Date.now() - startTime) / 1000).toFixed(1) + " 秒");
+      const timeSurvived = ((Date.now() - startTime) / 1000).toFixed(1);
+      setTimeout(() => {
+        const retry = confirm(`ゲームオーバー！\nスコア: ${score}\n生存時間: ${timeSurvived}秒\n\nもう一度？`);
+        if (retry) resetGame();
+      }, 100);
     }
   });
 
-  document.getElementById("time").textContent = ((Date.now() - startTime) / 1000).toFixed(1);
+  timeEl.textContent = ((Date.now() - startTime) / 1000).toFixed(1);
 }
 
 function draw() {
