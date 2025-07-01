@@ -25,6 +25,8 @@ body {
   width: 40%;
   font-size: 2rem;
   padding: 10px;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 #pauseButton {
