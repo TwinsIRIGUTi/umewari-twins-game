@@ -16,14 +16,24 @@ body {
   bottom: 10px;
   left: 0;
   width: 100%;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 #controls button {
   width: 40%;
   font-size: 2rem;
   padding: 10px;
-  margin: 0 5%;
+}
+
+#pauseButton {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  padding: 5px 10px;
+  z-index: 10;
 }
 
 .overlay {
