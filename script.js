@@ -9,8 +9,10 @@ let rightPressed = false;
 let score = 0;
 let startTime = Date.now();
 let gameOver = false;
+let paused = false;
 
 function spawnEnemy() {
+  if (paused || gameOver) return;
   const laneX = [60, 160, 260];
   const x = laneX[Math.floor(Math.random() * laneX.length)];
   enemies.push({ x, y: -40, width: 40, height: 40, hp: Math.ceil(Math.random() * 3) });
@@ -37,6 +39,8 @@ function drawEnemies() {
 }
 
 function update() {
+  if (paused) return;
+
   if (leftPressed) player.x -= player.speed;
   if (rightPressed) player.x += player.speed;
   player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
@@ -89,7 +93,7 @@ function drawHUD() {
 }
 
 function gameLoop() {
-  if (gameOver) return;
+  if (gameOver || paused) return requestAnimationFrame(gameLoop);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPlayer();
   drawBullets();
@@ -100,11 +104,11 @@ function gameLoop() {
 }
 
 setInterval(() => {
-  if (!gameOver) spawnEnemy();
+  if (!gameOver && !paused) spawnEnemy();
 }, 1000);
 
 setInterval(() => {
-  if (!gameOver) {
+  if (!gameOver && !paused) {
     bullets.push({ x: player.x + player.width / 2 - 2, y: player.y, width: 4, height: 10 });
   }
 }, 300);
@@ -113,6 +117,11 @@ document.getElementById("leftButton").addEventListener("touchstart", () => (left
 document.getElementById("leftButton").addEventListener("touchend", () => (leftPressed = false));
 document.getElementById("rightButton").addEventListener("touchstart", () => (rightPressed = true));
 document.getElementById("rightButton").addEventListener("touchend", () => (rightPressed = false));
+
+document.getElementById("pauseButton").addEventListener("click", () => {
+  paused = !paused;
+  if (!paused && !gameOver) gameLoop();
+});
 
 function endGame() {
   gameOver = true;
@@ -129,6 +138,7 @@ function restartGame() {
   player.x = 160;
   startTime = Date.now();
   gameOver = false;
+  paused = false;
   document.getElementById("gameOver").classList.add("hidden");
   gameLoop();
 }
