@@ -61,7 +61,7 @@ function showWaveStart(waveNum) {
 function spawnEnemyGroup(count, hp) {
   const centerX = 40 + Math.random() * 240;
   for (let i = 0; i < count; i++) {
-    const offset = (i % 10) * 10 - 45 + Math.random() * 5;
+    const offset = (i % 10) * 10 - 30 + Math.random() * 4;
     enemies.push({ x: centerX + offset, y: -20 * Math.floor(i / 10), hp });
   }
 }
@@ -90,7 +90,7 @@ function startNextWave() {
   let groupIndex = 0;
   const groupInterval = setInterval(() => {
     if (groupIndex < wave.groups) {
-      spawnEnemyGroup(10 + Math.floor(Math.random() * 10), wave.enemyHp);
+      spawnEnemyGroup(12, wave.enemyHp);
       groupIndex++;
     } else {
       clearInterval(groupInterval);
@@ -119,7 +119,7 @@ function startAutoShooting() {
     if (!isPaused && !isGameOver) {
       shootBullet(player.x + 10, player.y);
     }
-  }, 150);
+  }, 80); // ← 連射速度強化済み
 }
 
 function stopAutoShooting() {
