@@ -20,9 +20,9 @@ let player, bullets, enemies, turrets;
 let currentStage = 0;
 let currentWave = 0;
 let waveActive = false;
-let enemySpawnQueue = [];
 let turretLimit = 4;
 let turretAmmo = 1000;
+let autoShootInterval;
 
 const stages = [
   {
@@ -59,21 +59,19 @@ function showWaveStart(waveNum) {
 }
 
 function spawnEnemyGroup(count, hp) {
+  const centerX = 40 + Math.random() * 240;
   for (let i = 0; i < count; i++) {
-    const x = 40 + Math.random() * 280;
-    enemies.push({ x, y: -20 * i, hp });
+    const offset = (i % 10) * 10 - 45 + Math.random() * 5;
+    enemies.push({ x: centerX + offset, y: -20 * Math.floor(i / 10), hp });
   }
 }
 
 function spawnBoss(type) {
   let size = 20, hp = 5;
-  if (type === "small") {
-    size = 40; hp = 10;
-  } else if (type === "mid") {
-    size = 60; hp = 20;
-  } else if (type === "big") {
-    size = 80; hp = 40;
-  }
+  if (type === "small") { size = 40; hp = 10; }
+  else if (type === "mid") { size = 60; hp = 20; }
+  else if (type === "big") { size = 80; hp = 40; }
+
   enemies.push({ x: canvas.width / 2 - size / 2, y: -size, hp, size });
   showWarning("脅威接近中");
 }
@@ -97,20 +95,35 @@ function startNextWave() {
     } else {
       clearInterval(groupInterval);
       if (wave.boss) {
-        setTimeout(() => {
-          spawnBoss(wave.boss);
-        }, 1500);
+        setTimeout(() => spawnBoss(wave.boss), 1500);
       }
     }
   }, 1500);
 }
 
 function updateWaveProgress() {
-  if (waveActive && enemies.length === 0 && enemySpawnQueue.length === 0) {
+  if (waveActive && enemies.length === 0) {
     currentWave++;
     waveActive = false;
     setTimeout(startNextWave, 2000);
   }
+}
+
+function shootBullet(fromX, fromY, dx = 0, dy = -5) {
+  bullets.push({ x: fromX, y: fromY, dx, dy });
+}
+
+function startAutoShooting() {
+  if (autoShootInterval) clearInterval(autoShootInterval);
+  autoShootInterval = setInterval(() => {
+    if (!isPaused && !isGameOver) {
+      shootBullet(player.x + 10, player.y);
+    }
+  }, 150);
+}
+
+function stopAutoShooting() {
+  if (autoShootInterval) clearInterval(autoShootInterval);
 }
 
 function initGame() {
@@ -126,20 +139,13 @@ function initGame() {
   waveActive = false;
   gameOverDiv.classList.add("hidden");
   startNextWave();
-}
-
-function shootBullet(fromX, fromY, dx = 0, dy = -5) {
-  bullets.push({ x: fromX, y: fromY, dx, dy });
+  startAutoShooting();
 }
 
 function update() {
   if (isPaused || isGameOver) return;
 
-  bullets.forEach(b => {
-    b.x += b.dx;
-    b.y += b.dy;
-  });
-
+  bullets.forEach(b => { b.x += b.dx; b.y += b.dy; });
   bullets = bullets.filter(b => b.y > -10 && b.y < canvas.height && b.x > -10 && b.x < canvas.width);
 
   enemies.forEach(e => e.y += 1);
@@ -147,18 +153,9 @@ function update() {
   bullets.forEach(bullet => {
     enemies.forEach(e => {
       let size = e.size || 20;
-      if (
-        bullet.x > e.x &&
-        bullet.x < e.x + size &&
-        bullet.y > e.y &&
-        bullet.y < e.y + size
-      ) {
-        e.hp--;
-        bullet.hit = true;
-        if (e.hp <= 0) {
-          score += 10;
-          e.dead = true;
-        }
+      if (bullet.x > e.x && bullet.x < e.x + size && bullet.y > e.y && bullet.y < e.y + size) {
+        e.hp--; bullet.hit = true;
+        if (e.hp <= 0) { score += 10; e.dead = true; }
       }
     });
   });
@@ -168,9 +165,7 @@ function update() {
 
   enemies.forEach(e => {
     let size = e.size || 20;
-    if (e.y + size >= player.y) {
-      gameOver();
-    }
+    if (e.y + size >= player.y) gameOver();
   });
 
   turrets.forEach(t => {
@@ -210,9 +205,7 @@ function draw() {
 
   // turrets
   ctx.fillStyle = "cyan";
-  turrets.forEach(t => {
-    ctx.fillRect(t.x, t.y, 10, 10);
-  });
+  turrets.forEach(t => ctx.fillRect(t.x, t.y, 10, 10));
 
   // score
   ctx.fillStyle = "white";
@@ -228,6 +221,7 @@ function loop() {
 
 function gameOver() {
   isGameOver = true;
+  stopAutoShooting();
   finalScoreText.textContent = `スコア: ${score}`;
   finalTimeText.textContent = `生存時間: ${Math.floor((Date.now() - startTime) / 1000)}秒`;
   gameOverDiv.classList.remove("hidden");
@@ -239,8 +233,8 @@ function restartGame() {
 
 leftBtn.ontouchstart = () => player.x -= player.speed * 3;
 rightBtn.ontouchstart = () => player.x += player.speed * 3;
-leftBtn.ontouchmove = (e) => e.preventDefault();
-rightBtn.ontouchmove = (e) => e.preventDefault();
+leftBtn.ontouchmove = e => e.preventDefault();
+rightBtn.ontouchmove = e => e.preventDefault();
 
 placeTurretBtn.onclick = () => {
   if (score >= 500 && turrets.length < turretLimit) {
@@ -255,11 +249,6 @@ pauseBtn.onclick = () => {
   isPaused = !isPaused;
   pauseBtn.textContent = isPaused ? "▶️" : "⏸";
 };
-
-document.addEventListener("touchstart", (e) => {
-  if (e.target.tagName === "BUTTON") return;
-  shootBullet(player.x + 10, player.y);
-});
 
 initGame();
 loop();
