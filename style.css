@@ -1,91 +1,74 @@
 body {
   margin: 0;
-  overflow: hidden;
-  background: #111;
+  background-color: black;
+  color: white;
   font-family: sans-serif;
   touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 canvas {
   display: block;
   margin: 0 auto;
-  background: #222;
-  border: 2px solid #fff;
-}
-
-#controls {
-  position: fixed;
-  bottom: 20px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  z-index: 100;
-}
-
-#controls button {
-  font-size: 2rem;
-  padding: 10px 20px;
-  user-select: none;
+  background-color: #111;
   touch-action: none;
 }
 
-#pauseButton {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  font-size: 1.5rem;
-  z-index: 100;
+.controls {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
 }
 
-.overlay {
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
+.controls div {
   text-align: center;
-  z-index: 101;
+}
+
+button {
+  width: 60px;
+  height: 60px;
+  font-size: 20px;
+  background-color: #444;
+  border: none;
+  border-radius: 10px;
+  color: white;
+}
+
+button:focus {
+  outline: none;
+}
+
+.label {
+  margin-top: 5px;
+  font-size: 18px;
+  color: white;
 }
 
 .hidden {
   display: none;
 }
 
-.warning {
-  position: fixed;
-  top: 25%;
+.wave-text, .warning-text {
+  position: absolute;
+  top: 20%;
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: yellow;
+  text-shadow: 2px 2px black;
+}
+
+.game-over {
+  position: absolute;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2rem;
-  color: red;
-  font-weight: bold;
-  animation: fadeWarning 2s ease-in-out;
-  z-index: 99;
-}
-
-.wave-start {
-  position: fixed;
-  top: 18%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.8rem;
-  color: cyan;
-  font-weight: bold;
-  animation: fadeWave 2s ease-in-out;
-  z-index: 98;
-}
-
-@keyframes fadeWarning {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes fadeWave {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { opacity: 0; }
+  background-color: rgba(0,0,0,0.8);
+  padding: 20px;
+  border: 2px solid white;
+  border-radius: 10px;
+  text-align: center;
 }
