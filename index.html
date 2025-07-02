@@ -2,27 +2,37 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>梅割りツインズ：もつ煮の逆襲</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <canvas id="gameCanvas" width="360" height="640"></canvas>
+  <canvas id="gameCanvas" width="320" height="600"></canvas>
 
-  <div id="controls">
-    <button id="leftButton">←</button>
-    <button id="rightButton">→</button>
-    <button id="placeTurretButton">設置</button>
+  <div class="controls">
+    <div>
+      <button id="leftButton" ontouchstart="event.preventDefault();">　</button>
+      <div class="label">◀</div>
+    </div>
+    <div>
+      <button id="rightButton" ontouchstart="event.preventDefault();">　</button>
+      <div class="label">▶</div>
+    </div>
+    <div>
+      <button id="placeTurretButton" ontouchstart="event.preventDefault();">　</button>
+      <div class="label">設置</div>
+    </div>
+    <div>
+      <button id="pauseButton" ontouchstart="event.preventDefault();">⏸</button>
+      <div class="label">一時停止</div>
+    </div>
   </div>
 
-  <button id="pauseButton">⏸</button>
+  <div id="waveText" class="wave-text hidden">敵集団来襲！</div>
+  <div id="warningText" class="warning-text hidden">脅威接近中</div>
 
-  <div id="warningText" class="warning hidden">脅威接近中</div>
-  <div id="waveText" class="wave-start hidden"></div>
-
-  <div id="gameOver" class="overlay hidden">
-    <p>GAME OVER</p>
+  <div id="gameOver" class="game-over hidden">
+    <h1>ゲームオーバー</h1>
     <p id="finalScore"></p>
     <p id="finalTime"></p>
     <button onclick="restartGame()">もう一度？</button>
