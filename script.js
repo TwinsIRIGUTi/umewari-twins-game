@@ -59,8 +59,8 @@ function showWaveStart(waveNum) {
 }
 
 function spawnEnemyGroup(count, hp) {
-  const centerX = 60 + Math.random() * 200; // 中央寄り
-  const columnCount = 2; // 列数（横方向）を小さく
+  const centerX = 60 + Math.random() * 200;
+  const columnCount = 2;
   const spacingX = 15;
   const spacingY = 25;
 
@@ -126,7 +126,7 @@ function startAutoShooting() {
     if (!isPaused && !isGameOver) {
       shootBullet(player.x + 10, player.y);
     }
-  }, 80); // 高速連射
+  }, 80);
 }
 
 function stopAutoShooting() {
@@ -191,15 +191,12 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // player
   ctx.fillStyle = "white";
   ctx.fillRect(player.x, player.y, 20, 20);
 
-  // bullets
   ctx.fillStyle = "yellow";
   bullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 8));
 
-  // enemies
   ctx.fillStyle = "red";
   enemies.forEach(e => {
     let size = e.size || 20;
@@ -210,11 +207,9 @@ function draw() {
     ctx.fillStyle = "red";
   });
 
-  // turrets
   ctx.fillStyle = "cyan";
   turrets.forEach(t => ctx.fillRect(t.x, t.y, 10, 10));
 
-  // score
   ctx.fillStyle = "white";
   ctx.fillText(`Score: ${score}`, 10, 20);
   ctx.fillText(`Time: ${Math.floor((Date.now() - startTime) / 1000)}s`, 10, 40);
