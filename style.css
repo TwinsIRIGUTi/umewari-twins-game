@@ -1,32 +1,33 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: #000;
+  background: #111;
+  font-family: sans-serif;
+  touch-action: manipulation;
 }
 
-#gameCanvas {
+canvas {
   display: block;
+  margin: 0 auto;
   background: #222;
-  margin: auto;
-  touch-action: none;
+  border: 2px solid #fff;
 }
 
 #controls {
   position: fixed;
-  bottom: 10px;
-  left: 0;
+  bottom: 20px;
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 10px;
+  z-index: 100;
 }
 
 #controls button {
-  width: 40%;
   font-size: 2rem;
-  padding: 10px;
+  padding: 10px 20px;
   user-select: none;
-  touch-action: manipulation;
+  touch-action: none;
 }
 
 #pauseButton {
@@ -34,23 +35,57 @@ body {
   top: 10px;
   right: 10px;
   font-size: 1.5rem;
-  padding: 5px 10px;
-  z-index: 10;
+  z-index: 100;
 }
 
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
-  font-size: 1.5rem;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
   text-align: center;
-  padding-top: 200px;
+  z-index: 101;
 }
 
 .hidden {
   display: none;
+}
+
+.warning {
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  color: red;
+  font-weight: bold;
+  animation: fadeWarning 2s ease-in-out;
+  z-index: 99;
+}
+
+.wave-start {
+  position: fixed;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.8rem;
+  color: cyan;
+  font-weight: bold;
+  animation: fadeWave 2s ease-in-out;
+  z-index: 98;
+}
+
+@keyframes fadeWarning {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes fadeWave {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
 }
